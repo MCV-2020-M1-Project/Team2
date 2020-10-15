@@ -1,4 +1,4 @@
-#!/usr/bin/env python
+#!/usr/bin/env python3
 
 """ MCV - M1:  Introduction to human and computer vision
     Week 1 - Content Based Image Retrieval
@@ -12,6 +12,9 @@
 
 """ Imports """
 import argparse
+import os
+import numpy as np
+import sys 
 from functions import *
 
 """ Constants """
@@ -39,6 +42,24 @@ def build_arg_parser(ap):                       # here you can add all the flags
     ap.add_argument("-src2", "--source2", required=False, dest="src2", \
         help="path to the museum images for task 3")
 
+def load_images_from_folder(folder):
+    images = []
+    
+    if not os.path.isdir(folder):
+        sys.exit('Src path doesn\'t exist')
+
+    for filename in os.listdir(folder):
+        img = cv2.imread(os.path.join(folder,filename))
+        if img is not None:
+            images.append(img)
+        else:
+            print("Image "+filename+" couldn't be open")
+    
+    if len(images) == 0:
+        sys.exit('The folder: '+ folder + 'doesn\'t contain any images')
+
+    return images
+
 
 """ Main """
 def main():
@@ -46,40 +67,54 @@ def main():
     build_arg_parser(ap)
     args = ap.parse_args()
 
-    # we also should check if the path (src) exists and has images on it and download images or whatever --> maybe create a common function on functions.py that reads images? lo vamos viendo
+    images = load_images_from_folder(args.src)        
 
     if args.task == "1":
         if args.descriptor is None or args.descriptor not in DESCRIPTORS:
             ap.error('A correct descriptor must be provided for task 1, possible descriptors: ' + str(DESCRIPTORS))
         else:
-            print("blbalbalbalab")
-            # TODO: call the function on functions.py
+            for img in images:
+                cv2.imshow('image', img)
+                cv2.waitKey(0)
+                # TODO: call the function on functions.py and show the output to the user
     elif args.task == "2":
         if args.measure is None or args.measure not in MEASURES:
             ap.error('A correct measure must be provided for task 2, possible measures: ' + str(MEASURES))
         else:
-            print("blbalbalbalab2")
-            # TODO: call the function on functions.py
+            for img in images:
+                cv2.imshow('image', img)
+                cv2.waitKey(0)
+                # TODO: call the function on functions.py and show the output to the user
     elif args.task == "3":
         if args.src2 is None: # TODO: also check if the path exists or if other conditions must be met
             ap.error('A source path with the museum images must be provided in order to execute task 3')
         else:
-            print("blbalbalbalab3")
-            # TODO: call the function on functions.py
+            images2 = load_images_from_folder(args.src)
+                
+            for img in images:
+                cv2.imshow('image', img)
+                cv2.waitKey(0)
+                # TODO: call the function on functions.py and show the output to the user
     elif args.task == "4":
-        print("blbalbalbalab4")
-        # TODO: check conditions and if everything is ok call the correspondent function
+        # TODO: check conditions
+        for img in images:
+            cv2.imshow('image', img)
+            cv2.waitKey(0)
+            # TODO: call the function on functions.py and show the output to the user
     elif args.task == "5":
-        print("blbalbalbalab5")
-        # TODO: check conditions and if everything is ok call the correspondent function
+        # TODO: check conditions
+        for img in images:
+            cv2.imshow('image', img)
+            cv2.waitKey(0)
+            # TODO: call the function on functions.py and show the output to the user
     elif args.task == "6":
-        print("blbalbalbalab6")
-        # TODO: check conditions and if everything is ok call the correspondent function
+        # TODO: check conditions
+        for img in images:
+            cv2.imshow('image', img)
+            cv2.waitKey(0)
+            # TODO: call the function on functions.py and show the output to the user
     else:
         ap.error("Task must be a number between 1 and 6")
-
-
-
 
 if __name__ == "__main__":
     main()
