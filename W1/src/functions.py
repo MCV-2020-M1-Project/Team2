@@ -9,10 +9,13 @@
 
     functions.py: TODO
 """
+import itertools
+from collections import OrderedDict
 
 """ Imports """
 import cv2
 import numpy as np
+import math
 
 """ Constants """
 # here you can define all the constants you might need
@@ -44,6 +47,17 @@ def transform_color(image, color_space):
 
     return cv2.cvtColor(image, conv_color[color_space])
 
+def compute_gray_histogram(key,img):
+    """
+    Computes the gray-scale normalized histogram
+    :param img: 
+    :return: 
+    """
+    hist = dict()
+    gray = transform_color(img[key],"Gray")
+    hist= cv2.calcHist([gray], [0], None, [256], [0, 256])  # compute the histogram
+    hist = cv2.normalize(hist, hist)  # normalize the values of the histogram
+    return hist
 
 """ ----- T2 - SIMILARITY MEASURES ----- """
 def check(h_dataset, h_query):
@@ -56,7 +70,7 @@ def check(h_dataset, h_query):
     im_dataset, vals_dataset = np.shape(h_dataset)
     size_shape = np.shape(np.shape(h_query))[0]
     
-    
+
     # Case 1:
     if size_shape == 1:
         h_query = h_query[None, ...]
@@ -78,9 +92,8 @@ def check(h_dataset, h_query):
 
 def euclidean(h_dataset, h_query):
 
-    h_query = check(h_dataset, h_query)
-    distance = np.sum(np.sqrt((h_dataset - h_query) ** 2), axis=1)
-
+   # h_query = check(h_dataset, h_query)
+    distance = math.sqrt(sum((h_dataset - h_query)** 2))
     return distance
 
 def l1_distance(h_dataset, h_query):
@@ -133,10 +146,31 @@ def calculate_distances(h_dataset, h_query, mode):
 
 """ ----- T3 - IMAGE COMPARISION  ----- """
 # these functions have to be called by T4a and T4b
+def calculate_diferences(h_dataset,h_query,mode):
+    distances = dict()
+    for query in h_query.keys():
+        distance = dict()
+        for dataset in h_dataset.keys():
+
+            dist = calculate_distances(h_dataset[dataset],h_query[query],mode)
+            distance[dataset] = dist
+        distances[query] = distance
+
+    return distances
 
 
 """ ----- T4 - IMAGE COMPARISION  ----- """
 """ Top k """
+def get_top_k(differences,top_k):
+    query = []
+    results = []
+
+    for diff in differences.keys():
+        query.append(diff)
+        results.append(list(OrderedDict(sorted(differences[diff].items(), key=lambda t: t[1])).items())[:top_k])
+
+    return query,results
+
 
 """ MAP@k """
 # these functions have to be called by T6b

@@ -1,3 +1,4 @@
+
 #!/usr/bin/env python3
 
 """ MCV - M1:  Introduction to human and computer vision
@@ -9,13 +10,15 @@
 
     m1_w1.py: main program
 """
+import pickle
 
 """ Imports """
 import argparse
 import os
 import numpy as np
-import sys 
-from functions import *
+import sys
+sys.path.append(os.getcwd()[:os.getcwd().index('src')])
+import src.functions as functions
 
 """ Constants """
 DESCRIPTORS = ("some_descriptor", "another_descriptor") #TODO: add descriptors names
@@ -43,15 +46,15 @@ def build_arg_parser(ap):                       # here you can add all the flags
         help="path to the museum images for task 3")
 
 def load_images_from_folder(folder):
-    images = []
+    images = dict()
     
     if not os.path.isdir(folder):
         sys.exit('Src path doesn\'t exist')
 
     for filename in os.listdir(folder):
-        img = cv2.imread(os.path.join(folder,filename))
+        img = functions.cv2.imread(os.path.join(folder,filename))
         if img is not None:
-            images.append(img)
+            images[filename] = img
         else:
             print("Image "+filename+" couldn't be open")
     
@@ -68,39 +71,54 @@ def main():
     args = ap.parse_args()
 
     images = load_images_from_folder(args.src)        
-
-    if args.task == "1":
+    histograms_bbdd = dict()
+    histograms_qsw1 = dict()
+    if args.task == "1": #convert color image to gray level
         if args.descriptor is None or args.descriptor not in DESCRIPTORS:
             ap.error('A correct descriptor must be provided for task 1, possible descriptors: ' + str(DESCRIPTORS))
         else:
-            for img in images:
-                cv2.imshow('image', img)
-                cv2.waitKey(0)
-                # TODO: call the function on functions.py and show the output to the user
+            for img in images.keys():
+                gray = functions.transform_color(images[img],"Gray")
+
     elif args.task == "2":
         if args.measure is None or args.measure not in MEASURES:
             ap.error('A correct measure must be provided for task 2, possible measures: ' + str(MEASURES))
         else:
             for img in images:
-                cv2.imshow('image', img)
+                #cv2.imshow('image', img)
                 cv2.waitKey(0)
                 # TODO: call the function on functions.py and show the output to the user
     elif args.task == "3":
         if args.src2 is None: # TODO: also check if the path exists or if other conditions must be met
             ap.error('A source path with the museum images must be provided in order to execute task 3')
         else:
-            images2 = load_images_from_folder(args.src)
+            images2 = load_images_from_folder(args.src2)
                 
-            for img in images:
-                cv2.imshow('image', img)
-                cv2.waitKey(0)
-                # TODO: call the function on functions.py and show the output to the user
+            for img in images.keys(): #compute histogram of database
+                histograms_bbdd[img] = functions.compute_gray_histogram(img,images)
+
+            for img in images2.keys(): #compute the gray histograms of query set
+                histograms_qsw1[img] = functions.compute_gray_histogram(img,images2)
+
     elif args.task == "4":
-        # TODO: check conditions
-        for img in images:
-            cv2.imshow('image', img)
-            cv2.waitKey(0)
-            # TODO: call the function on functions.py and show the output to the user
+        if args.src2 is None:  # TODO: also check if the path exists or if other conditions must be met
+            ap.error('A source path with the museum images must be provided in order to execute task 3')
+        else:
+            images2 = load_images_from_folder(args.src2)
+
+            for img in images.keys(): #compute the gray_histograms of database
+                histograms_bbdd[img] = functions.compute_gray_histogram(img,images)
+
+            for img in images2.keys(): #compute histograms of query set
+                histograms_qsw1[img] = functions.compute_gray_histogram(img,images2)
+
+            distances = functions.calculate_diferences(histograms_bbdd,histograms_qsw1,"euclidean") #compute the euclidean distance between each image of queryset and database
+            query,top_results = functions.get_top_k(distances,10) #get a top 10 results
+            with open('result.pkl', 'wb') as output:  # write the results in a file
+                pickle.dump([query,top_results], output)
+            with open("result.pkl", "rb") as fp:  # load the results in a file
+                [loaded_query,loaded_results] = pickle.load(fp)
+            print(loaded_query,loaded_results)
     elif args.task == "5":
         # TODO: check conditions
         for img in images:
