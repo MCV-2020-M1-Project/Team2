@@ -98,8 +98,8 @@ def euclidean(h_dataset, h_query):
 
 def l1_distance(h_dataset, h_query):
 
-    h_query = check(h_dataset, h_query)
-    distance = np.sum(np.absolute(h_dataset - h_query), axis=1)
+    #h_query = check(h_dataset, h_query)
+    distance = sum(np.absolute(h_dataset - h_query))
 
     return distance
 
@@ -112,14 +112,14 @@ def x2_distance(h_dataset, h_query):
 
 def hist_intersection(h_dataset, h_query):
 
-    h_query = check(h_dataset, h_query)
+    #h_query = check(h_dataset, h_query)
     distance = 1/(np.sum(np.minimum(h_dataset, h_query), axis=1))
     return distance
 
 def hellinger(h_dataset, h_query):
 
-    h_query = check(h_dataset, h_query)
-    distance = 1/(np.sum(np.sqrt(h_dataset * h_query), axis=1))
+   # h_query = check(h_dataset, h_query)
+    distance = sum(np.sqrt(h_dataset * h_query))
     return distance
 
 def kl_divergence(h_dataset, h_query):
@@ -161,14 +161,16 @@ def calculate_diferences(h_dataset,h_query,mode):
 
 """ ----- T4 - IMAGE COMPARISION  ----- """
 """ Top k """
-def get_top_k(differences,top_k):
+def get_top_k(differences,top_k,reverse = False):
     query = []
     results = []
 
     for diff in differences.keys():
         query.append(diff)
-        results.append(list(OrderedDict(sorted(differences[diff].items(), key=lambda t: t[1])).items())[:top_k])
-
+        if not reverse:
+            results.append(list(OrderedDict(sorted(differences[diff].items(), key=lambda t: t[1])).items())[:top_k])
+        else:
+            results.append(list(OrderedDict(sorted(differences[diff].items(), key=lambda t: t[1])).items())[-top_k:])
     return query,results
 
 

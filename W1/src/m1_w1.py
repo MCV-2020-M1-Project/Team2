@@ -111,13 +111,36 @@ def main():
 
             for img in images2.keys(): #compute histograms of query set
                 histograms_qsw1[img] = functions.compute_gray_histogram(img,images2)
-
+            """
+                euclidean distance method
+            """
             distances = functions.calculate_diferences(histograms_bbdd,histograms_qsw1,"euclidean") #compute the euclidean distance between each image of queryset and database
             query,top_results = functions.get_top_k(distances,10) #get a top 10 results
             with open('result.pkl', 'wb') as output:  # write the results in a file
                 pickle.dump([query,top_results], output)
             with open("result.pkl", "rb") as fp:  # load the results in a file
                 [loaded_query,loaded_results] = pickle.load(fp)
+            #print(loaded_query,loaded_results)
+            """
+                l1 distance method
+            """
+
+            distances = functions.calculate_diferences(histograms_bbdd, histograms_qsw1,"l1_distance")  # compute the L1 distance between each image of queryset and database
+            query, top_results = functions.get_top_k(distances, 2)  # get a top 10 results
+            with open('result.pkl', 'wb') as output:  # write the results in a file
+                pickle.dump([query, top_results], output)
+            with open("result.pkl", "rb") as fp:  # load the results in a file
+                [loaded_query, loaded_results] = pickle.load(fp)
+
+            """
+                hellinger method
+            """
+            distances = functions.calculate_diferences(histograms_bbdd, histograms_qsw1,"hellinger")  # compute the L1 distance between each image of queryset and database
+            query, top_results = functions.get_top_k(distances, 2,True)  # get a top 10 results
+            with open('result.pkl', 'wb') as output:  # write the results in a file
+                pickle.dump([query, top_results], output)
+            with open("result.pkl", "rb") as fp:  # load the results in a file
+                [loaded_query, loaded_results] = pickle.load(fp)
             print(loaded_query,loaded_results)
     elif args.task == "5":
         # TODO: check conditions
