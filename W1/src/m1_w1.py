@@ -126,7 +126,7 @@ def main():
             """
 
             distances = functions.calculate_diferences(histograms_bbdd, histograms_qsw1,"l1_distance")  # compute the L1 distance between each image of queryset and database
-            query, top_results = functions.get_top_k(distances, 2)  # get a top 10 results
+            query, top_results = functions.get_top_k(distances, 10)  # get a top 10 results
             with open('result.pkl', 'wb') as output:  # write the results in a file
                 pickle.dump([query, top_results], output)
             with open("result.pkl", "rb") as fp:  # load the results in a file
@@ -136,7 +136,7 @@ def main():
                 hellinger method
             """
             distances = functions.calculate_diferences(histograms_bbdd, histograms_qsw1,"hellinger")  # compute the L1 distance between each image of queryset and database
-            query, top_results = functions.get_top_k(distances, 2,True)  # get a top 10 results
+            query, top_results = functions.get_top_k(distances, 10,True)  # get a top 10 results
             with open('result.pkl', 'wb') as output:  # write the results in a file
                 pickle.dump([query, top_results], output)
             with open("result.pkl", "rb") as fp:  # load the results in a file
