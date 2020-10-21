@@ -18,6 +18,7 @@ from pathlib import Path
 import os
 # Own files
 import histograms as histos
+import text_removal as txt_rm
 
 """ Constants """
 
@@ -29,12 +30,6 @@ import histograms as histos
 def task1(images, lvl, descriptor, csp, ch1, ch2, plot, store, masks=None):
     """
     Computes all the histograms from the images of a folder
-
-    :param images: src images
-    :param descriptor: kind of descriptor we want to extract from the images
-    :param plot: boolean that indicates if plots of the descriptors must be shown while on execution
-    :param store: boolean that indicates if plots must be stored in a result folder on the parent directory (must be created beforehand)
-    :return: histograms 
     """
     histograms = dict()
     for fn in images:
@@ -72,3 +67,21 @@ def task1(images, lvl, descriptor, csp, ch1, ch2, plot, store, masks=None):
             plt.close(fig)
 
     return histograms
+
+def task3(images, plot, store):
+    for fn in images:
+        img = images[fn]
+
+        bb = [(10, 10), (30, 30)]   # TODO: call the functions on text_removal.py that returns the bounding box of the text area, 
+                                    # right now the code is thinked in a way that [(x1, y1), (x2, y2)] 
+                                    #   x1,y1 are the coordinates of the left-top (respectively) corner of the bb 
+                                    #   x2,y2 are the coordinates of the right-bottom (respectively) corner of the bb
+        if plot or store:
+            to_show = cv2.rectangle(img, bb[0], bb[1], color=(0,255,0), thickness=2)
+            if plot:
+                cv2.imshow("t3_"+fn, to_show)
+                cv2.waitKey(0)
+                cv2.destroyWindow("t3_"+fn)
+            if store:
+                path = "../results/t3/"
+                cv2.imwrite(path+fn+".png", to_show)

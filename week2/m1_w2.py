@@ -109,7 +109,13 @@ def main():
                 elif args.ch1 == args.ch2:
                     ap.error('ch1 and ch2 can\'t be the same')
             tasks.task1(images[0], args.level, args.descriptor, args.color, args.ch1, args.ch2, plot, store)
-
+    
+    elif args.task == 2:
+        print("Not implemented") #Pendiente enviar correo profes
+    
+    elif args.task == 3:
+        tasks.task3(images[0], plot, store)
+        
     else:
         print("Not implemented")
 
