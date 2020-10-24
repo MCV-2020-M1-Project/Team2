@@ -17,6 +17,7 @@ import numpy as np
 import cv2
 import tasks as tasks
 import sys
+#sys.path.append(os.getcwd()[:os.getcwd().index('week2')])
 
 """ Constants """
 DESCRIPTORS = ("1D_hist", "2D_hist", "3D_hist")
@@ -52,7 +53,7 @@ def build_arg_parser(ap):
         help="stores the results from the tasks in the results folder (see documentation)")
 
 def read_images(dict, ext, folder):
-    for filename in os.listdir(folder):
+    for filename in sorted(os.listdir(folder)):
         if filename.find(ext) != -1:
             img = cv2.imread(os.path.join(folder,filename))
             if img is not None:

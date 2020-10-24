@@ -69,9 +69,12 @@ def task1(images, lvl, descriptor, csp, ch1, ch2, plot, store, masks=None):
     return histograms
 
 def task3(images, plot, store):
+    i = 0
     for fn in images:
         img = images[fn]
-
+        x, y, w, h = txt_rm.findBox(img)
+        txt_rm.saveMask(str(i)+".png",img,x,y,w,h)
+        i += 1
         bb = [(10, 10), (30, 30)]   # TODO: call the functions on text_removal.py that returns the bounding box of the text area, 
                                     # right now the code is thinked in a way that [(x1, y1), (x2, y2)] 
                                     #   x1,y1 are the coordinates of the left-top (respectively) corner of the bb 
