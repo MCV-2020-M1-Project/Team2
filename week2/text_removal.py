@@ -12,7 +12,8 @@
 
 """ Imports """
 import cv2
-import numpy as np  
+import numpy as np
+import pickle
 
 """ Constants """
 
@@ -36,7 +37,7 @@ def findBox(img):
                 x, y, w, h = cv2.boundingRect(c)
                 if area > area_max:
                     area_max = area
-                    xm, ym, wm, hm = x, y, w, h
+                    x1, y1, wm, hm = x, y, w, h
 
         if area_max == 0:
             sobelx = cv2.Sobel(gray, cv2.CV_64F, 1, 0, ksize=5)
@@ -53,13 +54,43 @@ def findBox(img):
                 if area > 500 and ((area / area_imagen) * 100) < 20:
                     if area > area_max:
                         area_max = area
-                        xm, ym, wm, hm = x, y, w, h
-        return xm, ym, wm, hm
+                        x1, y1, wm, hm = x, y, w, h
+        x2 = x1 + wm
+        y2 = y1 + hm
+        return [x1, y1, x2, y2]
 
-def saveMask(filename,img,x,y,w,h):
+def saveMask(filename,img,bbox):
     width = img.shape[1]
     height = img.shape[0]
     box_img = np.ones((height,width), np.uint8)
-    box_img[y:y+h,x:x+w] = 255
+    box_img[bbox[1]:bbox[3],bbox[0]:bbox[2]] = 255
     box_img = (255-box_img)
-    cv2.imwrite("bounding_masks/"+filename,box_img)
+    cv2.imwrite(".bounding_masks/"+filename,box_img)
+
+def evaluateIoU(src):
+    result = []
+    with open('.pickle_data/bboxes.pkl', 'rb') as f:
+        boxes_found = pickle.load(f)
+    with open(src+"/text_boxes.pkl","rb") as r:
+        boxes = pickle.load(r)
+    truth = []
+
+    for b in boxes:
+        truth.append([b[0][0][0],b[0][0][1],b[0][2][0],b[0][2][1]])
+
+
+    for r in range(len(truth)):
+        xA = max(boxes_found[r][1], truth[r][1])
+        yA = max(boxes_found[r][0], truth[r][0])
+        xB = min(boxes_found[r][3], truth[r][3])
+        yB = min(boxes_found[r][2], truth[r][2])
+
+        interArea = max( 0, xB - xA +1) *max(0, yB - yA +1)
+        bboxAArea = (boxes_found[r][2] - boxes_found[r][0] + 1) * (boxes_found[r][3] - boxes_found[r][1] + 1)
+        bboxBArea = (truth[r][2] - truth[r][0] + 1) * (truth[r][3] - truth[r][1] + 1)
+
+        iou = interArea / float(bboxAArea + bboxBArea - interArea)
+        result.append(iou)
+
+    return result
+#TODO implement functions that return the bounding box
