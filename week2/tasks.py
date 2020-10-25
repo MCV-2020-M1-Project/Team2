@@ -17,12 +17,9 @@ from matplotlib import pyplot as plt
 from pathlib import Path
 import ml_metrics as metrics
 import os
-<<<<<<< HEAD
 import sys
 import csv
-=======
 import pickle
->>>>>>> 1a4647a9032a68fdfc89bfc8ac78f95fc13dd49c
 # Own files
 import histograms as histos
 import text_removal as txt_rm
@@ -77,7 +74,6 @@ def task1(images, lvl, descriptor, csp, ch1, ch2, plot, store, masks=None):
 
     return histograms
 
-<<<<<<< HEAD
 def task2(images, bbdd, pkl_file, bckg_method, descriptor, lvl, csp, ch1, ch2, measure, plot, store):
     src_masks = dict()
     if bckg_method is not None:
@@ -111,9 +107,6 @@ def task2(images, bbdd, pkl_file, bckg_method, descriptor, lvl, csp, ch1, ch2, m
 
 
 def task3(images, plot, store):
-=======
-def task3(images, plot, store,src):
->>>>>>> 1a4647a9032a68fdfc89bfc8ac78f95fc13dd49c
     i = 0
     bboxes = []
     for fn in images:
