@@ -61,8 +61,9 @@ def findBox(img):
 def saveMask(filename,img,x,y,w,h):
     width = img.shape[1]
     height = img.shape[0]
-    box_img = np.zeros((height,width), np.uint8)
+    box_img = np.ones((height,width), np.uint8)
     box_img[y:y+h,x:x+w] = 255
+    box_img = (255-box_img)
     cv2.imwrite("bounding_masks/"+filename,box_img)
 
 
