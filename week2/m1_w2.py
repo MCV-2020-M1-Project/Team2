@@ -17,7 +17,7 @@ import numpy as np
 import cv2
 import tasks as tasks
 import sys
-import pickle as pkl
+#sys.path.append(os.getcwd()[:os.getcwd().index('week2')])
 
 """ Constants """
 DESCRIPTORS = ("1D_hist", "2D_hist", "3D_hist")
@@ -138,8 +138,8 @@ def main():
                     ap.error('ch1 and ch2 can\'t be the same')
         bbdd = load_images_from_folder(args.bbdd) 
 
-        #Read grandtruth from .pkl
-        actual = [] #just a list of all images from the query folder - not ordered
+        #Read ground truth from .pkl
+        actual = [] 
         with open(os.path.join(args.src,"gt_corresps.pkl"), 'rb') as gtfile:
             actual = pkl.load(gtfile)
 

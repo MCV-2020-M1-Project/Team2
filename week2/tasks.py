@@ -109,7 +109,6 @@ def task3(images, plot, store):
     i = 0
     for fn in images:
         img = images[fn]
-
         x, y, w, h = txt_rm.findBox(img)
         txt_rm.saveMask(str(i)+".png",img,x,y,w,h)
         i += 1
