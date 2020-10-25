@@ -328,10 +328,23 @@ def detect_multiple_paintings(images, method, csp):
     masks = dict()
 
     for fn in images:
-        initial_mask = background_substraction(images[fn], method, csp)
+        img = images[fn]
+        initial_mask = background_substraction(img, method, csp)
+        
+        kernel = np.ones((5,5), np.uint8)
+        closing = cv2.morphologyEx(initial_mask, cv2.MORPH_CLOSE, kernel)
+        contours, _ = cv2.findContours(closing, cv2.RETR_LIST, cv2.CHAIN_APPROX_SIMPLE)
 
-        contours, hier = cv2.findContours(initial_mask, cv2.RETR_LIST, cv2.CHAIN_APPROX_SIMPLE)
+        image_masks = []
+        img_w, img_h, _ = img.shape
+        for cnt in contours:
+            if cv2.cntArea(cnt) > 400*200:
+                mask = np.zeros([img_w, img_h, 1], dtype="uint8")
+                mask = cv2.drawContours(mask, [cnt], -1, (255), thickness=cv2.Filled)
+                image_masks.append(mask)
 
+        if len(image_masks) == 0:
+            mask = np.zeros([img_w, img_h, 1], dtype="uint8")
 
         masks[fn] = initial_mask
     return masks

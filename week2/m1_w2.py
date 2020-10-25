@@ -17,6 +17,7 @@ import numpy as np
 import cv2
 import tasks as tasks
 import sys
+import pickle as pkl
 #sys.path.append(os.getcwd()[:os.getcwd().index('week2')])
 
 """ Constants """

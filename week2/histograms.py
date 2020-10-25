@@ -75,6 +75,7 @@ def compute_3D_histogram(img, csp, mask):
     Computes 3D histogram
     """
     img = transform_color(img, csp)
+
     hist_a = cv2.calcHist([img], [0], mask, [256], [0,256]) # b (RGB), l (CieLAB), Y (YCrCb), H (HSV) 
     hist_b = cv2.calcHist([img], [1], mask, [256], [0,256]) # g (RGB), a (CieLAB), Cr (YCrCb), S (HSV) 
     hist_c = cv2.calcHist([img], [2], mask, [256], [0,256]) # r (RGB), b (CieLAB), Cb (YCrCb), V (HSV)
@@ -97,22 +98,26 @@ def compute_multi_histo(img, lvl, descriptor, csp, ch1, ch2, mask):
             y2 = int(step_w*(y+1))
 
             tile = img[x1:x2, y1:y2]
+            if mask is not None:
+                mask_tile = mask[x1:x2, y1:y2]
+            else:
+                mask_tile = None
 
             if descriptor == "1D_hist":
                 if hist is None:
-                    hist = compute_1D_histogram(tile, mask)
+                    hist = compute_1D_histogram(tile, mask_tile)
                 else:
-                    hist = np.concatenate((hist, compute_1D_histogram(tile, mask)))
+                    hist = np.concatenate((hist, compute_1D_histogram(tile, mask_tile)))
             elif descriptor == "2D_hist":
                 if hist is None:
-                    hist = compute_2D_histogram(tile, csp, ch1, ch2, mask)
+                    hist = compute_2D_histogram(tile, csp, ch1, ch2, mask_tile)
                 else:
-                    hist = np.concatenate((hist, compute_2D_histogram(tile, csp, ch1, ch2, mask)))
+                    hist = np.concatenate((hist, compute_2D_histogram(tile, csp, ch1, ch2, mask_tile)))
             elif descriptor == "3D_hist":
                 if hist is None:
-                    hist = compute_3D_histogram(tile, csp, mask)
+                    hist = compute_3D_histogram(tile, csp, mask_tile)
                 else: 
-                    hist = np.concatenate((hist, compute_3D_histogram(tile, csp, mask)))
+                    hist = np.concatenate((hist, compute_3D_histogram(tile, csp, mask_tile)))
             else:
                 sys.exit("Descriptor not supported")
     return hist

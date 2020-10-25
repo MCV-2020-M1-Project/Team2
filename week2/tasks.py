@@ -80,8 +80,6 @@ def task2(images, bbdd, pkl_file, bckg_method, descriptor, lvl, csp, ch1, ch2, m
         src_masks = bs.background_substraction_folder(images, bckg_method, csp)
     else:
         src_masks = None
-    # get ground truth
-
     src_histos = task1(images, lvl, descriptor, csp, ch1, ch2, False, False, src_masks)
     bbdd_histos = task1(bbdd, lvl, descriptor, csp, ch1, ch2, False, False)
     
@@ -132,11 +130,10 @@ def task3(images, plot, store):
                 cv2.imwrite(path+fn+".png", to_show)
 
 def task6(src_images, bckg_method, csp, plot, store):
-    bckg_masks = dict()
     for fn in src_images:
         img = src_images[fn]
 
-        
+        bs.detect_multiple_paintings
         
         if plot or store:
             if plot:
