@@ -17,10 +17,13 @@ import numpy as np
 import cv2
 import tasks as tasks
 import sys
+import pickle as pkl
 
 """ Constants """
 DESCRIPTORS = ("1D_hist", "2D_hist", "3D_hist")
 COLOR_SPACE = ("RGB", "HSV", "CieLAB", "YCbCr")
+BCKG_METHODS = ("msc", "mcst", "mcck", "canny", "watershed")
+MEASURES = ("eucl", "l1", "x2", "h_inter", "hell_ker", "corr", "chisq")
 
 """ Global variables """
 
@@ -36,14 +39,16 @@ def build_arg_parser(ap):
         help="descriptor name, possible descriptors: " + str(DESCRIPTORS))
     ap.add_argument("-lvl", "--level", required=False, type=int, dest="level", \
         help="level of the multiresolution histograms, must be an integer")
-    ap.add_argument("-c", "--color", required=False, dest="color", \
+    ap.add_argument("-c", "--csp", required=False, dest="csp", \
         help="color space, possible color spaces: " + str(COLOR_SPACE))
     ap.add_argument("-ch1", "--channel1", required=False, type=int, dest="ch1", \
         help="channel selected to compute the 2D hist -> 0, 1 or 2 (Respetively b,g,r in RGB; l,a,b in CieLAB; Y,Cr,Cb in YCrCb; H,S,V in HSV)")
     ap.add_argument("-ch2", "--channel2", required=False, type=int, dest="ch2", \
         help="channel selected to compute the 2D hist -> 0, 1 or 2 (Respetively b,g,r in RGB; l,a,b in CieLAB; Y,Cr,Cb in YCrCb; H,S,V in HSV)")
-    #ap.add_argument("-m", "--measure", required=False, dest="measure", \
-    #    help="measure name, possible measures: " + str(MEASURES))
+    ap.add_argument("-bm", "--bkcg_method", required=False, dest="bckg_method", \
+        help="method name, possible methods: " + str(BCKG_METHODS))
+    ap.add_argument("-m", "--measure", required=False, dest="measure", \
+        help="measure name, possible measure: " + str(MEASURES))
     ap.add_argument("-bbdd", "--bbdd", required=False, dest="bbdd", \
         help="path to the folder which contains the bbdd images")
     ap.add_argument("-plot", "--plot", required=False, dest="plot",\
@@ -52,7 +57,7 @@ def build_arg_parser(ap):
         help="stores the results from the tasks in the results folder (see documentation)")
 
 def read_images(dict, ext, folder):
-    for filename in os.listdir(folder):
+    for filename in sorted(os.listdir(folder)):
         if filename.find(ext) != -1:
             img = cv2.imread(os.path.join(folder,filename))
             if img is not None:
@@ -98,7 +103,7 @@ def main():
             ap.error('A correct descriptor must be provided for task 1, possible descriptors: ' + str(DESCRIPTORS))
         elif args.level is None or args.level < 1:
             ap.error('A valid histogram division level must be provided for task 1')
-        elif (args.descriptor == "3D_hist" or args.descriptor == "2D_hist") and (args.color is None or  args.color not in COLOR_SPACE):
+        elif (args.descriptor == "3D_hist" or args.descriptor == "2D_hist") and (args.csp is None or  args.csp not in COLOR_SPACE):
             ap.error('A correct color space must be provided for 2D and 3D histograms, possible color spaces: ' + str(COLOR_SPACE))
         else:
             if args.descriptor == "2D_hist":
@@ -108,14 +113,47 @@ def main():
                     ap.error('ch2 must be an integer between 0 and 2')
                 elif args.ch1 == args.ch2:
                     ap.error('ch1 and ch2 can\'t be the same')
-            tasks.task1(images[0], args.level, args.descriptor, args.color, args.ch1, args.ch2, plot, store)
+            tasks.task1(images[0], args.level, args.descriptor, args.csp, args.ch1, args.ch2, plot, store)
     
     elif args.task == 2:
-        print("Not implemented") #Pendiente enviar correo profes
+        if args.descriptor is None or args.descriptor not in DESCRIPTORS:
+            ap.error('A correct descriptor must be provided for task 1, possible descriptors: ' + str(DESCRIPTORS))
+        elif args.level is None or args.level < 1:
+            ap.error('A valid histogram division level must be provided for task 2')
+        elif (args.descriptor == "3D_hist" or args.descriptor == "2D_hist") and (args.csp is None or  args.csp not in COLOR_SPACE):
+            ap.error('A correct color space must be provided for 2D and 3D histograms, possible color spaces: ' + str(COLOR_SPACE))
+        elif args.measure is None or args.measure is None:
+            ap.error('A correct measure must be provided for task 2, possible measures: '+ str(MEASURES))
+        elif args.bckg_method in ("mcst", "mcck") and (args.csp is None or args.csp not in ("RGB", "HSV")):
+            ap.error('A correct color space must be provided for mcst and mcck bckg_methods, possible csp: RGB, HSV')
+        elif args.bbdd is None:
+            ap.error('A path to the database must be provided for task 2')
+        else:
+            if args.descriptor == "2D_hist":
+                if args.ch1 < 0 or args.ch1 > 2:
+                    ap.error('ch1 must be an integer between 0 and 2')
+                elif args.ch2 < 0 or args.ch2 > 2:
+                    ap.error('ch2 must be an integer between 0 and 2')
+                elif args.ch1 == args.ch2:
+                    ap.error('ch1 and ch2 can\'t be the same')
+        bbdd = load_images_from_folder(args.bbdd) 
+
+        #Read grandtruth from .pkl
+        actual = [] #just a list of all images from the query folder - not ordered
+        with open(os.path.join(args.src,"gt_corresps.pkl"), 'rb') as gtfile:
+            actual = pkl.load(gtfile)
+
+        tasks.task2(images[0], bbdd[0], actual, args.bckg_method, args.descriptor, args.level, args.csp, args.ch1, args.ch2, args.measure, args.plot, args.store)
     
     elif args.task == 3:
         tasks.task3(images[0], plot, store)
-        
+    elif args.task == 6:
+        if args.bckg_method is None or args.bckg_method not in BCKG_METHODS:
+            ap.error('A correct method must be provided for task 6, possible descriptors: ' + str(BCKG_METHODS))
+        elif args.bckg_method in ("mcst", "mcck") and (args.csp is None or args.csp not in ("RGB", "HSV")):
+            ap.error('A correct color space must be provided for mcst and mcck bckg_methods, possible csp: RGB, HSV')
+        else:
+            tasks.task6(images[0], args.bckg_method, args.csp, plot, store)
     else:
         print("Not implemented")
 

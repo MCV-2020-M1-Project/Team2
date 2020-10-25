@@ -22,7 +22,6 @@ import sys
 """ Classes """
 
 """ Functions """
-""" ----- T1 - HISTOGRAMS ----- """
 def transform_color(image, color_space):
     """
     Transforms the color space of an image

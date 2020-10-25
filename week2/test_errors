@@ -1,4 +1,5 @@
 #!/bin/bash
+'
 echo "--------- TASK 1 TESTS ---------"
 echo "------------ Level 1 -----------"
 echo "---> 1D_histo"
@@ -126,3 +127,21 @@ echo "---> 3D_histo, CieLAB"
 python m1_w2.py -t 1 -d 3D_hist -c CieLAB -lvl 3 -src ../../Datasets/qsd2_w1 -store True
 echo "---> 3D_histo, YCbCr"
 python m1_w2.py -t 1 -d 3D_hist -c YCbCr -lvl 3 -src ../../Datasets/qsd2_w1 -store True
+'
+
+
+echo "----- T6 - BKGD -----"
+echo "---> msc"
+python m1_w2.py -t 6 -bm msc -src ../../Datasets/qsd2_w1 -store True
+echo "---> mcst RGB"
+python m1_w2.py -t 6 -bm msc -c RGB -src ../../Datasets/qsd2_w1 -store True
+echo "---> mcst HSV"
+python m1_w2.py -t 6 -bm msc -c HSV -src ../../Datasets/qsd2_w1 -store True
+echo "---> mcck RGB"
+python m1_w2.py -t 6 -bm mcck -c RGB -src ../../Datasets/qsd2_w1 -store True
+echo "---> mcck HSV"
+python m1_w2.py -t 6 -bm mcck -c HSV -src ../../Datasets/qsd2_w1 -store True
+echo "---> canny"
+python m1_w2.py -t 6 -bm canny -src ../../Datasets/qsd2_w1 -store True
+echo "---> watershed"
+python m1_w2.py -t 6 -bm watershed -src ../../Datasets/qsd2_w1 -store True
