@@ -129,7 +129,92 @@ echo "---> 3D_histo, YCbCr"
 python m1_w2.py -t 1 -d 3D_hist -c YCbCr -lvl 3 -src ../../Datasets/qsd2_w1 -store True
 '
 
+echo "----- T2 - Retrieval eval qsd2_w1"
+echo "---> msc, lvl 1, l1, 3d rgb"
+python m1_w2.py -t 2 -bm msc -m l1 -src ../../Datasets/qsd2_w1/ -bbdd ../../Datasets/BBDD/ -d "3D_hist" -c "RGB" -store True -lvl 1
+echo "---> msc, lvl 2, l1, 3d rgb"
+python m1_w2.py -t 2 -bm msc -m l1 -src ../../Datasets/qsd2_w1/ -bbdd ../../Datasets/BBDD/ -d "3D_hist" -c "RGB" -store True -lvl 2
+echo "---> msc, lvl 3, l1, 3d rgb"
+python m1_w2.py -t 2 -bm msc -m l1 -src ../../Datasets/qsd2_w1/ -bbdd ../../Datasets/BBDD/ -d "3D_hist" -c "RGB" -store True -lvl 3
 
+echo "---> msc, lvl 1, x2, 3d rgb"
+python m1_w2.py -t 2 -bm msc -m x2 -src ../../Datasets/qsd2_w1/ -bbdd ../../Datasets/BBDD/ -d "3D_hist" -c "RGB" -store True -lvl 1
+echo "---> msc, lvl 2, x2, 3d rgb"
+python m1_w2.py -t 2 -bm msc -m x2 -src ../../Datasets/qsd2_w1/ -bbdd ../../Datasets/BBDD/ -d "3D_hist" -c "RGB" -store True -lvl 2
+echo "---> msc, lvl 3, x2, 3d rgb"
+python m1_w2.py -t 2 -bm msc -m x2 -src ../../Datasets/qsd2_w1/ -bbdd ../../Datasets/BBDD/ -d "3D_hist" -c "RGB" -store True -lvl 3
+
+echo "---> msc, lvl 1, l1, 3d hsv"
+python m1_w2.py -t 2 -bm msc -m l1 -src ../../Datasets/qsd2_w1/ -bbdd ../../Datasets/BBDD/ -d "3D_hist" -c "HSV" -store True -lvl 1
+echo "---> msc, lvl 2, l1, 3d hsv"
+python m1_w2.py -t 2 -bm msc -m l1 -src ../../Datasets/qsd2_w1/ -bbdd ../../Datasets/BBDD/ -d "3D_hist" -c "HSV" -store True -lvl 2
+echo "---> msc, lvl 3, l1, 3d hsv"
+python m1_w2.py -t 2 -bm msc -m l1 -src ../../Datasets/qsd2_w1/ -bbdd ../../Datasets/BBDD/ -d "3D_hist" -c "HSV" -store True -lvl 3
+
+echo "---> msc, lvl 1, x2, 3d hsv"
+python m1_w2.py -t 2 -bm msc -m x2 -src ../../Datasets/qsd2_w1/ -bbdd ../../Datasets/BBDD/ -d "3D_hist" -c "HSV" -store True -lvl 1
+echo "---> msc, lvl 2, x2, 3d hsv"
+python m1_w2.py -t 2 -bm msc -m x2 -src ../../Datasets/qsd2_w1/ -bbdd ../../Datasets/BBDD/ -d "3D_hist" -c "HSV" -store True -lvl 2
+echo "---> msc, lvl 3, x2, 3d hsv"
+python m1_w2.py -t 2 -bm msc -m x2 -src ../../Datasets/qsd2_w1/ -bbdd ../../Datasets/BBDD/ -d "3D_hist" -c "HSV" -store True -lvl 3
+
+echo "---> msc, lvl 1, l1, 2d hsv"
+python m1_w2.py -t 2 -bm msc -m l1 -src ../../Datasets/qsd2_w1/ -bbdd ../../Datasets/BBDD/ -d "2D_hist" -ch1 0 -ch2 1 -c "HSV" -store True -lvl 1
+echo "---> msc, lvl 2, l1, 2d hsv"
+python m1_w2.py -t 2 -bm msc -m l1 -src ../../Datasets/qsd2_w1/ -bbdd ../../Datasets/BBDD/ -d "2D_hist" -ch1 0 -ch2 1 -c "HSV" -store True -lvl 2
+echo "---> msc, lvl 3, l1, 2d hsv"
+python m1_w2.py -t 2 -bm msc -m l1 -src ../../Datasets/qsd2_w1/ -bbdd ../../Datasets/BBDD/ -d "2D_hist" -ch1 0 -ch2 1 -c "HSV" -store True -lvl 3
+
+echo "---> msc, lvl 1, x2, 2d hsv"
+python m1_w2.py -t 2 -bm msc -m x2 -src ../../Datasets/qsd2_w1/ -bbdd ../../Datasets/BBDD/ -d "2D_hist" -ch1 0 -ch2 1 -c "HSV" -store True -lvl 1
+echo "---> msc, lvl 2, x2, 2d hsv"
+python m1_w2.py -t 2 -bm msc -m x2 -src ../../Datasets/qsd2_w1/ -bbdd ../../Datasets/BBDD/ -d "2D_hist" -ch1 0 -ch2 1 -c "HSV" -store True -lvl 2
+echo "---> msc, lvl 3, x2, 2d hsv"
+python m1_w2.py -t 2 -bm msc -m x2 -src ../../Datasets/qsd2_w1/ -bbdd ../../Datasets/BBDD/ -d "2D_hist" -ch1 0 -ch2 1 -c "HSV" -store True -lvl 3
+
+echo "---> msc, lvl 1, l1, 3d rgb"
+python m1_w2.py -t 2 -bm msc -m l1 -src ../../Datasets/qsd2_w1/ -bbdd ../../Datasets/BBDD/ -d "3D_hist" -c "RGB" -store True -lvl 1
+echo "---> msc, lvl 2, l1, 3d rgb"
+python m1_w2.py -t 2 -bm msc -m l1 -src ../../Datasets/qsd2_w1/ -bbdd ../../Datasets/BBDD/ -d "3D_hist" -c "RGB" -store True -lvl 2
+echo "---> msc, lvl 3, l1, 3d rgb"
+python m1_w2.py -t 2 -bm msc -m l1 -src ../../Datasets/qsd2_w1/ -bbdd ../../Datasets/BBDD/ -d "3D_hist" -c "RGB" -store True -lvl 3
+
+echo "---> msc, lvl 1, x2, 3d rgb"
+python m1_w2.py -t 2 -bm msc -m x2 -src ../../Datasets/qsd2_w1/ -bbdd ../../Datasets/BBDD/ -d "3D_hist" -c "RGB" -store True -lvl 1
+echo "---> msc, lvl 2, x2, 3d rgb"
+python m1_w2.py -t 2 -bm msc -m x2 -src ../../Datasets/qsd2_w1/ -bbdd ../../Datasets/BBDD/ -d "3D_hist" -c "RGB" -store True -lvl 2
+echo "---> msc, lvl 3, x2, 3d rgb"
+python m1_w2.py -t 2 -bm msc -m x2 -src ../../Datasets/qsd2_w1/ -bbdd ../../Datasets/BBDD/ -d "3D_hist" -c "RGB" -store True -lvl 3
+
+echo "---> canny, lvl 1, l1, 3d hsv"
+python m1_w2.py -t 2 -bm canny -m l1 -src ../../Datasets/qsd2_w1/ -bbdd ../../Datasets/BBDD/ -d "3D_hist" -c "HSV" -store True -lvl 1
+echo "---> canny, lvl 2, l1, 3d hsv"
+python m1_w2.py -t 2 -bm canny -m l1 -src ../../Datasets/qsd2_w1/ -bbdd ../../Datasets/BBDD/ -d "3D_hist" -c "HSV" -store True -lvl 2
+echo "---> canny, lvl 3, l1, 3d hsv"
+python m1_w2.py -t 2 -bm canny -m l1 -src ../../Datasets/qsd2_w1/ -bbdd ../../Datasets/BBDD/ -d "3D_hist" -c "HSV" -store True -lvl 3
+
+echo "---> canny, lvl 1, x2, 3d hsv"
+python m1_w2.py -t 2 -bm canny -m x2 -src ../../Datasets/qsd2_w1/ -bbdd ../../Datasets/BBDD/ -d "3D_hist" -c "HSV" -store True -lvl 1
+echo "---> canny, lvl 2, x2, 3d hsv"
+python m1_w2.py -t 2 -bm canny -m x2 -src ../../Datasets/qsd2_w1/ -bbdd ../../Datasets/BBDD/ -d "3D_hist" -c "HSV" -store True -lvl 2
+echo "---> canny, lvl 3, x2, 3d hsv"
+python m1_w2.py -t 2 -bm canny -m x2 -src ../../Datasets/qsd2_w1/ -bbdd ../../Datasets/BBDD/ -d "3D_hist" -c "HSV" -store True -lvl 3
+
+echo "---> canny, lvl 1, l1, 2d hsv"
+python m1_w2.py -t 2 -bm canny -m l1 -src ../../Datasets/qsd2_w1/ -bbdd ../../Datasets/BBDD/ -d "2D_hist" -ch1 0 -ch2 1 -c "HSV" -store True -lvl 1
+echo "---> canny, lvl 2, l1, 2d hsv"
+python m1_w2.py -t 2 -bm canny -m l1 -src ../../Datasets/qsd2_w1/ -bbdd ../../Datasets/BBDD/ -d "2D_hist" -ch1 0 -ch2 1 -c "HSV" -store True -lvl 2
+echo "---> canny, lvl 3, l1, 2d hsv"
+python m1_w2.py -t 2 -bm canny -m l1 -src ../../Datasets/qsd2_w1/ -bbdd ../../Datasets/BBDD/ -d "2D_hist" -ch1 0 -ch2 1 -c "HSV" -store True -lvl 3
+
+echo "---> canny, lvl 1, x2, 2d hsv"
+python m1_w2.py -t 2 -bm canny -m x2 -src ../../Datasets/qsd2_w1/ -bbdd ../../Datasets/BBDD/ -d "2D_hist" -ch1 0 -ch2 1 -c "HSV" -store True -lvl 1
+echo "---> canny, lvl 2, x2, 2d hsv"
+python m1_w2.py -t 2 -bm canny -m x2 -src ../../Datasets/qsd2_w1/ -bbdd ../../Datasets/BBDD/ -d "2D_hist" -ch1 0 -ch2 1 -c "HSV" -store True -lvl 2
+echo "---> canny, lvl 3, x2, 2d hsv"
+python m1_w2.py -t 2 -bm canny -m x2 -src ../../Datasets/qsd2_w1/ -bbdd ../../Datasets/BBDD/ -d "2D_hist" -ch1 0 -ch2 1 -c "HSV" -store True -lvl 3
+
+'''
 echo "----- T6 - BKGD -----"
 echo "---> msc"
 python m1_w2.py -t 6 -bm msc -src ../../Datasets/qsd2_w1 -store True
@@ -145,3 +230,4 @@ echo "---> canny"
 python m1_w2.py -t 6 -bm canny -src ../../Datasets/qsd2_w1 -store True
 echo "---> watershed"
 python m1_w2.py -t 6 -bm watershed -src ../../Datasets/qsd2_w1 -store True
+'''

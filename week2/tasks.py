@@ -38,10 +38,9 @@ def task1(images, lvl, descriptor, csp, ch1, ch2, plot, store, masks=None):
     Computes all the histograms from the images of a folder
     """
     histograms = dict()
-
     for fn in images:
         img = images[fn]
-
+        
         if masks is not None:
             mask = masks[fn]
         else:
@@ -85,7 +84,7 @@ def task2(images, bbdd, pkl_file, bckg_method, descriptor, lvl, csp, ch1, ch2, m
 
     src_histos = task1(images, lvl, descriptor, csp, ch1, ch2, False, False, src_masks)
     bbdd_histos = task1(bbdd, lvl, descriptor, csp, ch1, ch2, False, False)
-
+    
     topk = [None] * len(src_histos)
     for fn in src_histos:
         src_histo = src_histos[fn]
@@ -172,12 +171,11 @@ def task5(images, bbdd,pkl_file, descriptor, lvl, csp, ch1, ch2, measure, plot):
 
 
 def task6(src_images, bckg_method, csp, plot, store):
-    bckg_masks = dict()
     for fn in src_images:
         img = src_images[fn]
 
-
-
+        bs.detect_multiple_paintings
+        
         if plot or store:
             if plot:
                 cv2.imshow("t6_bckg_"+fn)

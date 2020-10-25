@@ -93,4 +93,3 @@ def evaluateIoU(src):
         result.append(iou)
 
     return result
-#TODO implement functions that return the bounding box
