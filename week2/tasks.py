@@ -38,9 +38,10 @@ def task1(images, lvl, descriptor, csp, ch1, ch2, plot, store, masks=None):
     Computes all the histograms from the images of a folder
     """
     histograms = dict()
+
     for fn in images:
         img = images[fn]
-        
+
         if masks is not None:
             mask = masks[fn]
         else:
@@ -84,7 +85,7 @@ def task2(images, bbdd, pkl_file, bckg_method, descriptor, lvl, csp, ch1, ch2, m
 
     src_histos = task1(images, lvl, descriptor, csp, ch1, ch2, False, False, src_masks)
     bbdd_histos = task1(bbdd, lvl, descriptor, csp, ch1, ch2, False, False)
-    
+
     topk = [None] * len(src_histos)
     for fn in src_histos:
         src_histo = src_histos[fn]
@@ -106,14 +107,15 @@ def task2(images, bbdd, pkl_file, bckg_method, descriptor, lvl, csp, ch1, ch2, m
                 writer.writerow([str(pkl_file[i]), str(topk[i])])
 
 
-def task3(images, plot, store):
+def task3(images, plot, store,src):
     i = 0
     bboxes = []
     for fn in images:
         img = images[fn]
         bbox = txt_rm.findBox(img)
         bboxes.append(bbox)
-        txt_rm.saveMask(str(i)+".png",img,bbox)
+        name = str(i)
+        txt_rm.saveMask(src+"/"+name.zfill(5)+".png",img,bbox,src)
 
         i += 1
         bb = [(10, 10), (30, 30)]   # TODO: call the functions on text_removal.py that returns the bounding box of the text area,
@@ -131,13 +133,51 @@ def task3(images, plot, store):
                 Path(path).mkdir(parents=True, exist_ok=True)
                 cv2.imwrite(path+fn+".png", to_show)
 
+def task4(images,src):
+    i = 0
+    bboxes = []
+    for fn in images:
+        img = images[fn]
+        bbox = txt_rm.findBox(img)
+        bboxes.append(bbox)
+        i += 1
+    with open(".pickle_data/results.pkl","wb") as f:
+        pickle.dump(bboxes,f)
+    iou_results = txt_rm.evaluateIoU(src)
+    print(iou_results)
+
+    with open(".pickle_data/results.pkl","rb") as f:
+        boxes = pickle.load(f)
+    print(boxes)
+
+def task5(images, bbdd,pkl_file, descriptor, lvl, csp, ch1, ch2, measure, plot):
+
+    src_histos = task1(images[0], lvl, descriptor, csp, ch1, ch2, False, False, images[1])
+    bbdd_histos = task1(bbdd, lvl, descriptor, csp, ch1, ch2, False, False)
+
+    topk = [None] * len(src_histos)
+    for fn in src_histos:
+        src_histo = src_histos[fn]
+        topk[int(fn)] = dists.get_top_k_similar(src_histo, bbdd_histos, measure, 10)
+
+
+    map_k = metrics.kdd_mapk(pkl_file, topk, 1)
+
+    with open(".pickle_data/results_task5.pkl", "wb") as f:
+        pickle.dump(topk, f)
+    with open(".pickle_data/results_task5.pkl", "rb") as r:
+        top_k = pickle.load(r)
+    print(top_k)
+    print(map_k)
+
+
 def task6(src_images, bckg_method, csp, plot, store):
     bckg_masks = dict()
     for fn in src_images:
         img = src_images[fn]
 
-        
-        
+
+
         if plot or store:
             if plot:
                 cv2.imshow("t6_bckg_"+fn)

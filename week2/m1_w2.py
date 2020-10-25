@@ -13,6 +13,7 @@
 """ Imports """
 import argparse
 import os
+import pickle as pkl
 import numpy as np
 import cv2
 import tasks as tasks
@@ -59,7 +60,11 @@ def build_arg_parser(ap):
 def read_images(dict, ext, folder):
     for filename in sorted(os.listdir(folder)):
         if filename.find(ext) != -1:
-            img = cv2.imread(os.path.join(folder,filename))
+            if(ext == ".png"):
+                img = cv2.imread(os.path.join(folder, filename))
+                img = cv2.cvtColor(img, cv2.COLOR_BGR2GRAY)
+            else:
+                img = cv2.imread(os.path.join(folder,filename))
             if img is not None:
                 dict[os.path.splitext(filename)[0]] = img
             else:
@@ -68,7 +73,7 @@ def read_images(dict, ext, folder):
 def load_images_from_folder(folder):
     images = dict()
     masks = dict()
-    
+
     if not os.path.isdir(folder):
         sys.exit('Src path doesn\'t exist')
 
@@ -136,17 +141,44 @@ def main():
                     ap.error('ch2 must be an integer between 0 and 2')
                 elif args.ch1 == args.ch2:
                     ap.error('ch1 and ch2 can\'t be the same')
-        bbdd = load_images_from_folder(args.bbdd) 
+        bbdd = load_images_from_folder(args.bbdd)
 
         #Read ground truth from .pkl
-        actual = [] 
+        actual = []
         with open(os.path.join(args.src,"gt_corresps.pkl"), 'rb') as gtfile:
             actual = pkl.load(gtfile)
 
         tasks.task2(images[0], bbdd[0], actual, args.bckg_method, args.descriptor, args.level, args.csp, args.ch1, args.ch2, args.measure, args.plot, args.store)
     
     elif args.task == 3:
-        tasks.task3(images[0], plot, store)
+        tasks.task3(images[0], plot, store,args.src)
+    elif args.task == 4:
+        tasks.task4(images[0],args.src)
+
+    elif args.task == 5:
+        if args.descriptor is None or args.descriptor not in DESCRIPTORS:
+            ap.error('A correct descriptor must be provided for task 1, possible descriptors: ' + str(DESCRIPTORS))
+        elif args.level is None or args.level < 1:
+            ap.error('A valid histogram division level must be provided for task 2')
+        elif (args.descriptor == "3D_hist" or args.descriptor == "2D_hist") and (args.csp is None or  args.csp not in COLOR_SPACE):
+            ap.error('A correct color space must be provided for 2D and 3D histograms, possible color spaces: ' + str(COLOR_SPACE))
+        elif args.measure is None or args.measure is None:
+            ap.error('A correct measure must be provided for task 2, possible measures: '+ str(MEASURES))
+        elif args.bbdd is None:
+            ap.error('A path to the database must be provided for task 2')
+        else:
+            if args.descriptor == "2D_hist":
+                if args.ch1 < 0 or args.ch1 > 2:
+                    ap.error('ch1 must be an integer between 0 and 2')
+                elif args.ch2 < 0 or args.ch2 > 2:
+                    ap.error('ch2 must be an integer between 0 and 2')
+                elif args.ch1 == args.ch2:
+                    ap.error('ch1 and ch2 can\'t be the same')
+        bbdd = load_images_from_folder(args.bbdd)
+        with open(os.path.join(args.src, "gt_corresps.pkl"), 'rb') as gtfile:
+            actual = pkl.load(gtfile)
+        tasks.task5(images, bbdd[0], actual, args.descriptor, args.level, args.csp, args.ch1,args.ch2, args.measure, args.plot)
+
     elif args.task == 6:
         if args.bckg_method is None or args.bckg_method not in BCKG_METHODS:
             ap.error('A correct method must be provided for task 6, possible descriptors: ' + str(BCKG_METHODS))
