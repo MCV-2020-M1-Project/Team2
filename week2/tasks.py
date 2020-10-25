@@ -16,6 +16,7 @@ import numpy as np
 from matplotlib import pyplot as plt
 from pathlib import Path
 import os
+import pickle
 # Own files
 import histograms as histos
 import text_removal as txt_rm
@@ -68,16 +69,19 @@ def task1(images, lvl, descriptor, csp, ch1, ch2, plot, store, masks=None):
 
     return histograms
 
-def task3(images, plot, store):
+def task3(images, plot, store,src):
     i = 0
+    bboxes = []
     for fn in images:
         img = images[fn]
-        x, y, w, h = txt_rm.findBox(img)
-        txt_rm.saveMask(str(i)+".png",img,x,y,w,h)
+        bbox = txt_rm.findBox(img)
+        bboxes.append(bbox)
+        txt_rm.saveMask(str(i)+".png",img,bbox)
+
         i += 1
-        bb = [(10, 10), (30, 30)]   # TODO: call the functions on text_removal.py that returns the bounding box of the text area, 
-                                    # right now the code is thinked in a way that [(x1, y1), (x2, y2)] 
-                                    #   x1,y1 are the coordinates of the left-top (respectively) corner of the bb 
+        bb = [(10, 10), (30, 30)]   # TODO: call the functions on text_removal.py that returns the bounding box of the text area,
+                                    # right now the code is thinked in a way that [(x1, y1), (x2, y2)]
+                                    #   x1,y1 are the coordinates of the left-top (respectively) corner of the bb
                                     #   x2,y2 are the coordinates of the right-bottom (respectively) corner of the bb
         if plot or store:
             to_show = cv2.rectangle(img, bb[0], bb[1], color=(0,255,0), thickness=2)
@@ -88,3 +92,6 @@ def task3(images, plot, store):
             if store:
                 path = "../results/t3/"
                 cv2.imwrite(path+fn+".png", to_show)
+    #iou_results = txt_rm.evaluateIoU(src)
+
+

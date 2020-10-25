@@ -115,7 +115,7 @@ def main():
         print("Not implemented") #Pendiente enviar correo profes
     
     elif args.task == 3:
-        tasks.task3(images[0], plot, store)
+        tasks.task3(images[0], plot, store, args.src)
         
     else:
         print("Not implemented")
