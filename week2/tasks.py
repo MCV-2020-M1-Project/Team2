@@ -87,62 +87,125 @@ def task2(images, bbdd, pkl_file, bckg_method, descriptor, lvl, csp, ch1, ch2, m
     for fn in src_histos:
         src_histo = src_histos[fn]
         topk[int(fn)] = dists.get_top_k_similar(src_histo, bbdd_histos, measure, 1)
-    print(topk)
-    print(pkl_file)
 
     map_k = metrics.kdd_mapk(pkl_file, topk, 1)
 
-    print(map_k)
-
     if store:
-        with open('../results/results_t2.csv', 'w', newline='') as file:
+        with open('../results/results_t2.csv', 'a', newline='') as file:
             writer = csv.writer(file)
-            writer.writerow(['Descriptor: '+descriptor, 'Measure: '+ measure, 'k: '+ str(1),"Bckg_Method: "+bckg_method, "Lvl: "+str(lvl)])
+            writer.writerow(['Descriptor: '+descriptor, 'csp: '+csp, 'Measure: '+ measure, 'k: '+ str(1),"Bckg_Method: "+bckg_method, "Lvl: "+str(lvl)])
             writer.writerow(['Map@k: '+str(map_k)])
-            writer.writerow(['Actual','Predicted'])
-            for i in range(len(pkl_file)):
-                writer.writerow([str(pkl_file[i]), str(topk[i])])
+            #writer.writerow(['Actual','Predicted'])
+            #for i in range(len(pkl_file)):
+            #    writer.writerow([str(pkl_file[i]), str(topk[i])])
 
 
-def task3(images, plot, store):
-    i = 0
+def task3(images, bbdd, pkl_file, lvl, measure, k, plot, store, mask=None):
     bboxes = []
+    masks = dict()
+    pkl_bb = [None] * len(images)
+
     for fn in images:
         img = images[fn]
-        bbox = txt_rm.findBox(img)
+        width = img.shape[1]
+        height = img.shape[0]
+
+        bbox = txt_rm.findBox(img, mask)
         bboxes.append(bbox)
-        txt_rm.saveMask(str(i)+".png",img,bbox)
 
-        i += 1
-        bb = [(10, 10), (30, 30)]   # TODO: call the functions on text_removal.py that returns the bounding box of the text area,
-                                    # right now the code is thinked in a way that [(x1, y1), (x2, y2)]
-                                    #   x1,y1 are the coordinates of the left-top (respectively) corner of the bb
-                                    #   x2,y2 are the coordinates of the right-bottom (respectively) corner of the bb
-        if plot or store:
-            to_show = cv2.rectangle(img, bb[0], bb[1], color=(0,255,0), thickness=2)
-            if plot:
-                cv2.imshow("t3_"+fn, to_show)
-                cv2.waitKey(0)
-                cv2.destroyWindow("t3_"+fn)
-            if store:
-                path = "../results/t3/"
-                Path(path).mkdir(parents=True, exist_ok=True)
-                cv2.imwrite(path+fn+".png", to_show)
+        box_img = np.ones((height,width), np.uint8)
+        box_img[bbox[1]:bbox[3],bbox[0]:bbox[2]] = 255
+        box_img = (255-box_img)
+        masks[fn] = box_img
+    
+        pkl_bb[int(fn)] = [bbox]
+    
+    src_histos = task1(images, lvl, '3D_hist', "RGB", None, None, False, False, masks)
+    bbdd_histos = task1(bbdd, lvl, '3D_hist', "RGB", None, None, False, False)
 
-def task6(src_images, bckg_method, csp, plot, store):
-    for fn in src_images:
+    topk = [None] * len(images)
+    pkl_topk = [None] * len(images)
+    for fn in src_histos:
+        src_histo = src_histos[fn]
+        topk[int(fn)] = dists.get_top_k_similar(src_histo, bbdd_histos, measure, k)
+        pkl_topk[int(fn)] = [topk[int(fn)]]
+
+    map_k = metrics.kdd_mapk(pkl_file, topk, k)
+
+    # store pkl file
+    with open('../results/QST1/result'+str(lvl)+str(k)+'.pkl', 'wb') as f:
+        pickle.dump(pkl_topk, f)
+    with open('../results/QST1/text_boxes'+str(lvl)+str(k)+'.pkl', 'wb') as f:
+        pickle.dump(pkl_bb, f)
+
+    with open('../results/results_t3.csv', 'a', newline='') as file:
+        writer = csv.writer(file)
+        writer.writerow(['Measure: '+ measure, 'k: '+ str(k), "Lvl: "+str(lvl)])
+        writer.writerow(['Map@k: '+str(map_k)])
+        #writer.writerow(['Actual','Predicted'])
+        #for i in range(len(pkl_file)):
+        #    writer.writerow([str(pkl_file[i]), str(topk[i])])
+
+def task6(src_images, bbdd, pickle_file, measure, lvl, k, plot, store):
+    bckg_masks = bs.detect_multiple_paintings(src_images, "canny", "RGB")
+    bbdd_histos = task1(bbdd, lvl, "3D_hist", "RGB", None, None, False, False)
+
+    topk = [None]*len(bckg_masks)
+    bboxes = [None]*len(bckg_masks)
+    map_k = 0
+    idx = 0
+
+    for fn in bckg_masks:
+        image_bkg_mask = bckg_masks[fn]
         img = src_images[fn]
+        width = img.shape[1]
+        height = img.shape[0]
 
-        bs.detect_multiple_paintings
+        img_topk = []
+        img_bboxes = []
+        for mask in image_bkg_mask:
+            bbox = txt_rm.findBox(img, mask)
+            if bbox[0] is not None:
+                img_bboxes.append(bbox)
+
+                box_img = np.ones((height,width), np.uint8)
+                box_img[bbox[1]:bbox[3],bbox[0]:bbox[2]] = 255
+                box_img = (255-box_img)
+                mask = cv2.bitwise_and(mask, box_img)
+
+            path = '../results/masks'+str(lvl)+str(k)+'/'
+            Path(path).mkdir(parents=True, exist_ok=True)
+            cv2.imwrite(mask, path)
+            mask_histo = histos.compute_multi_histo(img, lvl, "3D_hist", "RGB", None, None, mask)
+
+            mask_topk = dists.get_top_k_similar(mask_histo, bbdd_histos, measure, 10)
+            img_topk.append(mask_topk)
+
+            #compute MAP 
+            if(len(pickle_file[int(fn)]) == 2):
+                if pickle_file[int(fn)][0] in mask_topk or pickle_file[int(fn)][1] in mask_topk:
+                    map_k += 1
+            elif(len(pickle_file[int(fn)]) == 1):
+                if pickle_file[int(fn)][0] in mask_topk:
+                    map_k += 1
+            else:
+                print("Esto no dbería estar pasando")
+            idx += 1
+
+        topk[int(fn)] = img_topk
+        bboxes[int(fn)] = img_bboxes
+
+        # compute MAP@k
+        map_k = float(map_k)/idx
+    
+    # store pkl file
+    with open('../results/QST2/result'+str(lvl)+str(k)+'.pkl', 'wb') as f:
+        pickle.dump(topk, f)
+    with open('../results/QST2/text_boxes'+str(lvl)+str(k)+'.pkl', 'wb') as f:
+        pickle.dump(bboxes, f)
+    with open('../results/results_t6.csv', 'a', newline='') as file:
+        writer = csv.writer(file)
+        writer.writerow(['Measure: '+ measure, 'k: '+ str(k), "Lvl: "+str(lvl)])
+        writer.writerow(['Map@k: '+str(map_k)])
         
-        if plot or store:
-            if plot:
-                cv2.imshow("t6_bckg_"+fn)
-                cv2.waitKey(0)
-                cv2.destroyWindow("t6_bckg_"+fn)
-            if store:
-                path = "../results/t6/bckg/"+bckg_method+"/"
-                if bckg_method in ("mcst", "mcck"):
-                    path += csp+"/"
-                Path(path).mkdir(parents=True, exist_ok=True)
-                cv2.imwrite(path+fn+".png", bckg_mask)
+    

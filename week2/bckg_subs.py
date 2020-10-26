@@ -16,6 +16,8 @@ import numpy as np
 from matplotlib import pyplot as plt
 from sklearn.cluster import KMeans
 import sys
+from pathlib import Path
+import glob
 # Own files
 import histograms as histos
 
@@ -263,6 +265,11 @@ def method_watershed(img):
 
     return mask
 
+def count_white_pxs(contour):
+    x1, y1, w, h = cv2.boundingRect(contour)
+    img = np.zeros( [y1+h+50, x1+w+50, 1], dtype="uint8")
+    img = cv2.drawContours(img, [contour], -1, (255), thickness=cv2.FILLED)
+    return cv2.countNonZero(img)
 
 def method_canny(img):
     """
@@ -271,23 +278,45 @@ def method_canny(img):
     :param img:  image (BGR)
     :return: binary mask
     """
+    sigma = 0.33
     image_gray = cv2.cvtColor(img, cv2.COLOR_RGB2GRAY)
-    mask = np.zeros_like(image_gray).astype(np.int32)
-
     blurred = cv2.GaussianBlur(image_gray, (5, 5), 0)
-    canny = cv2.Canny(blurred, 50, 150)
+    
+    median = np.median(image_gray)
+    lower = int(max(0, (1.0 - sigma) * median ))
+    upper = int(min(255, (1.0 + sigma) * median))
+    canny = cv2.Canny(blurred, lower, upper)
 
-    sum_col_values = canny.sum(axis=0)
-    sum_row_values = canny.sum(axis=1)
+    kernel = np.ones((15,15), np.uint8)
+    closing = cv2.morphologyEx(canny, cv2.MORPH_CLOSE, kernel)
 
-    upper_frame = np.nonzero(sum_row_values)[0][0]
-    lower_frame = (canny.shape[0]-1) - np.nonzero(sum_row_values[::-1])[0][0]
-    left_frame = np.nonzero(sum_col_values)[0][0]
-    right_frame = (canny.shape[1]-1) - np.nonzero(sum_col_values[::-1])[0][0]
+    cv2.destroyAllWindows()
 
-    mask[upper_frame:lower_frame, left_frame:right_frame] = 255  # pixels corresponding to detected painting area
+    cnts, _ = cv2.findContours(closing, cv2.RETR_EXTERNAL, cv2.CHAIN_APPROX_SIMPLE)
+    
+    painting_cnt = []
+    img_w, img_h, _ = img.shape
 
-    return mask
+    for cnt in cnts:
+        _, _, w, h = cv2.boundingRect(cnt)
+        if (w > 400 and h > 200) or (h > 400 and w > 200):
+            painting_cnt.append(cnt)
+    
+    if len(painting_cnt) == 0:
+        mask = np.zeros([img_w, img_h, 1], dtype="uint8")
+        mask.fill(255)
+        return mask
+
+    if len(painting_cnt) > 2:
+        painting_cnt = sorted(painting_cnt, key = count_white_pxs, reverse = True)[:2]
+    
+    final_mask = np.zeros([img_w, img_h, 1], dtype="uint8")
+    for cnt in painting_cnt:
+        mask = np.zeros([img_w, img_h, 1], dtype="uint8")
+        mask = cv2.drawContours(mask, [cnt], -1, (255), thickness=cv2.FILLED)
+        final_mask = cv2.bitwise_or(final_mask, mask)
+    
+    return final_mask
 
 
 def background_substraction(img, method, csp):
@@ -330,21 +359,39 @@ def detect_multiple_paintings(images, method, csp):
     for fn in images:
         img = images[fn]
         initial_mask = background_substraction(img, method, csp)
-        
-        kernel = np.ones((5,5), np.uint8)
-        closing = cv2.morphologyEx(initial_mask, cv2.MORPH_CLOSE, kernel)
-        contours, _ = cv2.findContours(closing, cv2.RETR_LIST, cv2.CHAIN_APPROX_SIMPLE)
+
+        contours, _ = cv2.findContours(initial_mask, cv2.RETR_LIST, cv2.CHAIN_APPROX_SIMPLE)
 
         image_masks = []
+        painting_cnt = []
         img_w, img_h, _ = img.shape
+
         for cnt in contours:
-            if cv2.cntArea(cnt) > 400*200:
-                mask = np.zeros([img_w, img_h, 1], dtype="uint8")
-                mask = cv2.drawContours(mask, [cnt], -1, (255), thickness=cv2.Filled)
-                image_masks.append(mask)
+            _, _, w, h = cv2.boundingRect(cnt)
+            if (w > 400 and h > 200) or (h > 400 and w > 200):
+                painting_cnt.append(cnt)
 
-        if len(image_masks) == 0:
+        if len(painting_cnt) == 0:
             mask = np.zeros([img_w, img_h, 1], dtype="uint8")
+            mask.fill(255)
+            image_masks.append(mask)
 
-        masks[fn] = initial_mask
+        if len(painting_cnt) > 2:
+            painting_cnt = sorted(painting_cnt, key = count_white_pxs, reverse=True)[:2]
+    
+        for cnt in painting_cnt:
+            mask = np.zeros([img_w, img_h, 1], dtype="uint8")
+            mask = cv2.drawContours(mask, [cnt], -1, (255), thickness=cv2.FILLED)
+            image_masks.append(mask)
+            
+        masks[fn] = image_masks
+        
+        idx=1
+        for mask in masks[fn]:
+            path = "../results/t6/bckg/"+method+"/"
+            if method in ("mcst", "mcck"):
+                    path += csp+"/"
+            Path(path).mkdir(parents=True, exist_ok=True)
+            cv2.imwrite(path+fn+"_"+str(idx)+".png", mask)
+            idx += 1
     return masks

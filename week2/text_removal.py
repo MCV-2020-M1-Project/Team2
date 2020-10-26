@@ -22,12 +22,18 @@ import pickle
 """ Classes """
 
 """ Functions """
-def findBox(img):
+def findBox(img, mask):
+    x1 = y1 = x2 = y2 = None
     if img is not None:
         gray = cv2.cvtColor(img, cv2.COLOR_BGR2GRAY)
         laplacian = cv2.Laplacian(gray, cv2.CV_64F)
         laplacian = cv2.convertScaleAbs(laplacian)
+
+        if mask is not None:
+            laplacian = cv2.bitwise_and(laplacian, mask)
+
         cnt = cv2.findContours(laplacian, cv2.RETR_TREE, cv2.CHAIN_APPROX_NONE)
+
         area_imagen = img.shape[0] * img.shape[1]
 
         area_max = 0
@@ -46,6 +52,10 @@ def findBox(img):
             sobel = cv2.convertScaleAbs(sobel)
             sobel = (255 - sobel)
             sobel = cv2.GaussianBlur(sobel, (3, 3), 0)
+
+            if mask is not None:
+                sobel = cv2.bitwise_and(sobel, mask)
+
             cnt2 = cv2.findContours(sobel, cv2.RETR_TREE, cv2.CHAIN_APPROX_NONE)
             area_max = 0
             for c in cnt2[0]:
@@ -55,8 +65,10 @@ def findBox(img):
                     if area > area_max:
                         area_max = area
                         x1, y1, wm, hm = x, y, w, h
-        x2 = x1 + wm
-        y2 = y1 + hm
+        if x1 is not None:
+            x2 = x1 + wm
+            y2 = y1 + hm
+            
         return [x1, y1, x2, y2]
 
 def saveMask(filename,img,bbox):

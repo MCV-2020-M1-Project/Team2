@@ -56,6 +56,8 @@ def build_arg_parser(ap):
         help="allows plotting the results from the tasks")
     ap.add_argument("-store", "--store", required=False, dest="store",\
         help="stores the results from the tasks in the results folder (see documentation)")
+    ap.add_argument("-k", "--k", required=False, dest="k", type=int, \
+        help="K value for MAP@K")
 
 def read_images(dict, ext, folder):
     for filename in sorted(os.listdir(folder)):
@@ -145,21 +147,44 @@ def main():
             actual = pkl.load(gtfile)
 
         tasks.task2(images[0], bbdd[0], actual, args.bckg_method, args.descriptor, args.level, args.csp, args.ch1, args.ch2, args.measure, args.plot, args.store)
-    
     elif args.task == 3:
-        tasks.task3(images[0], plot, store)
-    elif args.task == 6:
-        if args.bckg_method is None or args.bckg_method not in BCKG_METHODS:
-            ap.error('A correct method must be provided for task 6, possible descriptors: ' + str(BCKG_METHODS))
-        elif args.bckg_method in ("mcst", "mcck") and (args.csp is None or args.csp not in ("RGB", "HSV")):
-            ap.error('A correct color space must be provided for mcst and mcck bckg_methods, possible csp: RGB, HSV')
+        if args.level is None or args.level < 1:
+            ap.error('A valid histogram division level must be provided for task 3')
+        elif  args.k is None or args.k < 1:
+            ap.error('A valid k value be provided for task 3')
+        elif args.bbdd is None:
+            ap.error('A path to the database must be provided for task 3')
+        elif args.measure is None or args.measure is None:
+            ap.error('A correct measure must be provided for task 3, possible measures: '+ str(MEASURES))
         else:
-            tasks.task6(images[0], args.bckg_method, args.csp, plot, store)
-    else:
-        print("Not implemented")
+            bbdd = load_images_from_folder(args.bbdd)
+            with open(os.path.join(args.src,"gt_corresps.pkl"), 'rb') as gtfile:
+                actual = pkl.load(gtfile)
 
-    #else:
-    #    ap.error("Task must be a number between 1 and 6")
+            tasks.task3(images[0], bbdd[0], actual, args.level, args.measure, args.k, plot, store)
+    elif args.task == 6:
+        if args.level is None or args.level < 1:
+            ap.error('A valid histogram division level must be provided for task 6')
+        elif  args.k is None or args.k < 1:
+            ap.error('A valid k value be provided for task 6')
+        elif args.bbdd is None:
+            ap.error('A path to the database must be provided for task 6')
+        elif args.measure is None or args.measure is None:
+            ap.error('A correct measure must be provided for task 6, possible measures: '+ str(MEASURES))
+        else:
+            bbdd = load_images_from_folder(args.bbdd)
+            with open(os.path.join(args.src,"gt_corresps.pkl"), 'rb') as gtfile:
+                actual = pkl.load(gtfile)
+            #with open('../results/QST2/result.pkl', 'rb') as f:
+            #    results = pkl.load(f)
+            #with open('../results/QST2/text_boxes.pkl', 'rb') as f:
+            #    text_boxes = pkl.load(f)
+            #print(results)
+            #print(text_boxes)
+            
+            tasks.task6(images[0], bbdd[0], actual, args.measure, args.level, args.k, plot, store)
+    else:
+        print("Task not found")
 
 if __name__ == "__main__":
     main()
