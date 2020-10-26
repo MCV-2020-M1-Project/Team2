@@ -80,6 +80,8 @@ def task2(images, bbdd, pkl_file, bckg_method, descriptor, lvl, csp, ch1, ch2, m
         src_masks = bs.background_substraction_folder(images, bckg_method, csp)
     else:
         src_masks = None
+    # get ground truth
+
     src_histos = task1(images, lvl, descriptor, csp, ch1, ch2, False, False, src_masks)
     bbdd_histos = task1(bbdd, lvl, descriptor, csp, ch1, ch2, False, False)
     
@@ -101,6 +103,7 @@ def task2(images, bbdd, pkl_file, bckg_method, descriptor, lvl, csp, ch1, ch2, m
 
 
 def task3(images, bbdd, pkl_file, lvl, measure, k, plot, store, mask=None):
+    """Also implements t5 MAP @k """
     bboxes = []
     masks = dict()
     pkl_bb = [None] * len(images)
@@ -145,6 +148,23 @@ def task3(images, bbdd, pkl_file, lvl, measure, k, plot, store, mask=None):
         #writer.writerow(['Actual','Predicted'])
         #for i in range(len(pkl_file)):
         #    writer.writerow([str(pkl_file[i]), str(topk[i])])
+
+def task4(images,src):
+    i = 0
+    bboxes = []
+    for fn in images:
+        img = images[fn]
+        bbox = txt_rm.findBox(img)
+        bboxes.append(bbox)
+        i += 1
+    with open(".pickle_data/results.pkl","wb") as f:
+        pickle.dump(bboxes,f)
+    iou_results = txt_rm.evaluateIoU(src)
+    print(iou_results)
+
+    with open(".pickle_data/results.pkl","rb") as f:
+        boxes = pickle.load(f)
+    print(boxes)
 
 def task6(src_images, bbdd, pickle_file, measure, lvl, k, plot, store):
     bckg_masks = bs.detect_multiple_paintings(src_images, "canny", "RGB")

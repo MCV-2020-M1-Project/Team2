@@ -71,13 +71,13 @@ def findBox(img, mask):
             
         return [x1, y1, x2, y2]
 
-def saveMask(filename,img,bbox):
+def saveMask(filename,img,bbox,src):
     width = img.shape[1]
     height = img.shape[0]
     box_img = np.ones((height,width), np.uint8)
     box_img[bbox[1]:bbox[3],bbox[0]:bbox[2]] = 255
     box_img = (255-box_img)
-    cv2.imwrite(".bounding_masks/"+filename,box_img)
+    cv2.imwrite(filename,box_img)
 
 def evaluateIoU(src):
     result = []
