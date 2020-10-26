@@ -246,14 +246,14 @@ python m1_w2.py -t 3  -m l1 -src ../../Datasets/qsd1_w2/ -bbdd ../../Datasets/BB
 python m1_w2.py -t 3  -m l1 -src ../../Datasets/qsd1_w2/ -bbdd ../../Datasets/BBDD/ -lvl 3 -k 3
 '''
 echo "QSD2"
-python m1_w2.py -t 3  -m l1 -src ../../Datasets/qsd2_w2/ -bbdd ../../Datasets/BBDD/ -lvl 1 -k 10
-python m1_w2.py -t 3  -m l1 -src ../../Datasets/qsd2_w2/ -bbdd ../../Datasets/BBDD/ -lvl 2 -k 10
-python m1_w2.py -t 3  -m l1 -src ../../Datasets/qsd2_w2/ -bbdd ../../Datasets/BBDD/ -lvl 3 -k 10
+python m1_w2.py -t 6  -m l1 -src ../../Datasets/qsd2_w2/ -bbdd ../../Datasets/BBDD/ -lvl 1 -k 10
+python m1_w2.py -t 6  -m l1 -src ../../Datasets/qsd2_w2/ -bbdd ../../Datasets/BBDD/ -lvl 2 -k 10
+python m1_w2.py -t 6  -m l1 -src ../../Datasets/qsd2_w2/ -bbdd ../../Datasets/BBDD/ -lvl 3 -k 10
 
-python m1_w2.py -t 3  -m l1 -src ../../Datasets/qsd2_w2/ -bbdd ../../Datasets/BBDD/ -lvl 1 -k 5
-python m1_w2.py -t 3  -m l1 -src ../../Datasets/qsd2_w2/ -bbdd ../../Datasets/BBDD/ -lvl 2 -k 5
-python m1_w2.py -t 3  -m l1 -src ../../Datasets/qsd2_w2/ -bbdd ../../Datasets/BBDD/ -lvl 3 -k 5
+python m1_w2.py -t 6  -m l1 -src ../../Datasets/qsd2_w2/ -bbdd ../../Datasets/BBDD/ -lvl 1 -k 5
+python m1_w2.py -t 6  -m l1 -src ../../Datasets/qsd2_w2/ -bbdd ../../Datasets/BBDD/ -lvl 2 -k 5
+python m1_w2.py -t 6  -m l1 -src ../../Datasets/qsd2_w2/ -bbdd ../../Datasets/BBDD/ -lvl 3 -k 5
 
-python m1_w2.py -t 3  -m l1 -src ../../Datasets/qsd2_w2/ -bbdd ../../Datasets/BBDD/ -lvl 1 -k 3
-python m1_w2.py -t 3  -m l1 -src ../../Datasets/qsd2_w2/ -bbdd ../../Datasets/BBDD/ -lvl 2 -k 3
-python m1_w2.py -t 3  -m l1 -src ../../Datasets/qsd2_w2/ -bbdd ../../Datasets/BBDD/ -lvl 3 -k 3
+python m1_w2.py -t 6  -m l1 -src ../../Datasets/qsd2_w2/ -bbdd ../../Datasets/BBDD/ -lvl 1 -k 3
+python m1_w2.py -t 6  -m l1 -src ../../Datasets/qsd2_w2/ -bbdd ../../Datasets/BBDD/ -lvl 2 -k 3
+python m1_w2.py -t 6  -m l1 -src ../../Datasets/qsd2_w2/ -bbdd ../../Datasets/BBDD/ -lvl 3 -k 3

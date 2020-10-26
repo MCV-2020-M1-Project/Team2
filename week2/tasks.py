@@ -195,7 +195,7 @@ def task6(src_images, bbdd, pickle_file, measure, lvl, k, plot, store):
 
             path = '../results/masks'+str(lvl)+str(k)+'/'
             Path(path).mkdir(parents=True, exist_ok=True)
-            cv2.imwrite(mask, path)
+            cv2.imwrite(path+fn+'.png', mask)
             mask_histo = histos.compute_multi_histo(img, lvl, "3D_hist", "RGB", None, None, mask)
 
             mask_topk = dists.get_top_k_similar(mask_histo, bbdd_histos, measure, 10)
@@ -215,8 +215,8 @@ def task6(src_images, bbdd, pickle_file, measure, lvl, k, plot, store):
         topk[int(fn)] = img_topk
         bboxes[int(fn)] = img_bboxes
 
-        # compute MAP@k
-        map_k = float(map_k)/idx
+    # compute MAP@k
+    map_k = float(map_k)/idx
     
     # store pkl file
     with open('../results/QST2/result'+str(lvl)+str(k)+'.pkl', 'wb') as f:
